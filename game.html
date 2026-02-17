@@ -121,34 +121,84 @@ body:before{
     <div>👤 naser_sh1989 ⭐ 155 — x1.55</div>
 </div>
 
-<button class="bet-btn" onclick="startGame()">🎯 شرط بندی</button>
+<button id="betBtn" class="bet-btn" onclick="startGame()">🎯 شرط بندی</button>
+
+<button id="cashBtn"
+        style="position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
+        width:90%;background:#00c853;border:none;padding:15px;
+        border-radius:15px;font-size:18px;color:white;"
+        onclick="cashOut()" disabled>
+    💰 برداشت پول
+</button>
 
 <script>
-let multiplier=1;
-let running=false;
+let multiplier = 1;
+let running = false;
+let crashed = false;
+let cashedOut = false;
+let crashPoint = 0;
+let betAmount = 100;
+let interval;
 
 function startGame(){
     if(running) return;
-    running=true;
-    multiplier=1;
-    let crash=Math.random()*3+1;
 
-    let interval=setInterval(()=>{
-        multiplier+=0.02;
-        document.getElementById("multiplier").innerText=multiplier.toFixed(2)+"x";
+    running = true;
+    crashed = false;
+    cashedOut = false;
+    multiplier = 1;
+    crashPoint = Math.random()*3 + 1;
 
-        if(multiplier>=crash){
+    document.getElementById("multiplier").innerText = "1.00x";
+    document.getElementById("betBtn").innerText = "⏳ در حال پرواز...";
+    document.getElementById("cashBtn").disabled = false;
+
+    interval = setInterval(()=>{
+        multiplier += 0.02;
+        document.getElementById("multiplier").innerText = multiplier.toFixed(2)+"x";
+
+        if(multiplier >= crashPoint){
             clearInterval(interval);
-            document.getElementById("multiplier").innerText="💥 "+crash.toFixed(2)+"x";
-            running=false;
+            crashed = true;
+            running = false;
 
-            if(window.Telegram?.WebApp){
-                let result=multiplier>=2?"win":"lose";
-                let amount=100;
-                Telegram.WebApp.sendData(JSON.stringify({result,amount}));
+            document.getElementById("multiplier").innerText =
+                "💥 انفجار در " + crashPoint.toFixed(2)+"x";
+
+            document.getElementById("betBtn").innerText = "🎯 شرط بندی";
+            document.getElementById("cashBtn").disabled = true;
+
+            if(!cashedOut){
+                sendToBot("lose", betAmount);
             }
         }
     },50);
+}
+
+function cashOut(){
+    if(!running || crashed || cashedOut) return;
+
+    cashedOut = true;
+    running = false;
+    clearInterval(interval);
+
+    let winAmount = Math.floor(betAmount * multiplier);
+
+    document.getElementById("multiplier").innerText =
+        "✅ برداشت در " + multiplier.toFixed(2)+"x";
+
+    document.getElementById("betBtn").innerText = "🎯 شرط بندی";
+    document.getElementById("cashBtn").disabled = true;
+
+    sendToBot("win", winAmount);
+}
+
+function sendToBot(result, amount){
+    if(window.Telegram?.WebApp){
+        Telegram.WebApp.sendData(
+            JSON.stringify({result, amount})
+        );
+    }
 }
 </script>
 
