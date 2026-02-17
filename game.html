@@ -14,7 +14,7 @@ body{
     overflow:hidden;
 }
 
-/* ستاره‌های پس زمینه */
+/* ستاره‌ها */
 body:before{
     content:"";
     position:absolute;
@@ -24,65 +24,30 @@ body:before{
     opacity:0.3;
 }
 
-/* موشک */
-.rocket{
-    position:absolute;
-    top:30%;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:80px;
-    animation: float 2s ease-in-out infinite alternate;
-}
-
-@keyframes float{
-    from{transform:translate(-50%,0px);}
-    to{transform:translate(-50%,-20px);}
-}
-
 /* ضریب بالا */
 #multiplier{
     position:absolute;
     top:20px;
     left:50%;
     transform:translateX(-50%);
-    font-size:38px;
+    font-size:40px;
     font-weight:bold;
     text-shadow:0 0 20px #00bfff;
 }
 
-/* دکمه‌های ضریب */
-.multiplier-row{
+/* موشک */
+.rocket{
     position:absolute;
-    top:55%;
-    width:100%;
-    display:flex;
-    justify-content:center;
-    gap:10px;
+    top:35%;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:90px;
+    animation: float 2s ease-in-out infinite alternate;
 }
 
-.mult-btn{
-    background:#1e2a3d;
-    padding:10px 20px;
-    border-radius:25px;
-    color:#fff;
-    font-weight:bold;
-    opacity:0.8;
-}
-
-.mult-btn.active{
-    background:white;
-    color:black;
-}
-
-/* باکس لیست */
-.players{
-    position:absolute;
-    bottom:100px;
-    width:100%;
-    background:rgba(20,30,50,0.9);
-    border-top-left-radius:20px;
-    border-top-right-radius:20px;
-    padding:15px;
+@keyframes float{
+    from{transform:translate(-50%,0px);}
+    to{transform:translate(-50%,-20px);}
 }
 
 /* دکمه شرط */
@@ -99,6 +64,21 @@ body:before{
     font-size:20px;
     color:white;
 }
+
+/* دکمه برداشت */
+.cash-btn{
+    position:absolute;
+    bottom:90px;
+    left:50%;
+    transform:translateX(-50%);
+    width:90%;
+    background:#00c853;
+    border:none;
+    padding:15px;
+    border-radius:15px;
+    font-size:18px;
+    color:white;
+}
 </style>
 </head>
 
@@ -108,27 +88,12 @@ body:before{
 
 <div class="rocket">🚀</div>
 
-<div class="multiplier-row">
-    <div class="mult-btn active">x1.55</div>
-    <div class="mult-btn">x1.01</div>
-    <div class="mult-btn">x1.86</div>
-    <div class="mult-btn">x2.20</div>
-</div>
+<button id="cashBtn" class="cash-btn" onclick="cashOut()" disabled>
+💰 برداشت پول
+</button>
 
-<div class="players">
-    <div>👤 stexx35 ⭐ 1,170 — x1.30 ✔</div>
-    <div>👤 rik_profekt ⭐ 310 — x1.55</div>
-    <div>👤 naser_sh1989 ⭐ 155 — x1.55</div>
-</div>
-
-<button id="betBtn" class="bet-btn" onclick="startGame()">🎯 شرط بندی</button>
-
-<button id="cashBtn"
-        style="position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
-        width:90%;background:#00c853;border:none;padding:15px;
-        border-radius:15px;font-size:18px;color:white;"
-        onclick="cashOut()" disabled>
-    💰 برداشت پول
+<button id="betBtn" class="bet-btn" onclick="startGame()">
+🎯 شرط بندی
 </button>
 
 <script>
@@ -155,7 +120,8 @@ function startGame(){
 
     interval = setInterval(()=>{
         multiplier += 0.02;
-        document.getElementById("multiplier").innerText = multiplier.toFixed(2)+"x";
+        document.getElementById("multiplier").innerText =
+            multiplier.toFixed(2)+"x";
 
         if(multiplier >= crashPoint){
             clearInterval(interval);
