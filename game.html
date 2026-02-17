@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>بازی انفجار حرفه‌ای</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #multiplier {
+            font-size: 48px;
+            margin-top: 100px;
+        }
+        #startBtn {
+            padding: 15px 30px;
+            font-size: 24px;
+            background-color: #8a2be2;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+        }
+        #startBtn:hover {
+            background-color: #a64bf4;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 بازی انفجار</h1>
+    <div id="multiplier">1.00x</div>
+    <button id="startBtn">شروع بازی</button>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const multiplierDiv = document.getElementById('multiplier');
+
+        startBtn.onclick = () => {
+            let multiplier = 1.00;
+            multiplierDiv.innerText = multiplier.toFixed(2) + "x";
+            let crash = (Math.random() * 3 + 1).toFixed(2); // ضریب انفجار 1 تا 4
+            startBtn.disabled = true;
+
+            const interval = setInterval(() => {
+                multiplier += 0.01;
+                multiplierDiv.innerText = multiplier.toFixed(2) + "x";
+
+                if (multiplier.toFixed(2) >= crash) {
+                    clearInterval(interval);
+                    multiplierDiv.innerText = "💥 انفجار در " + crash + "x";
+                    startBtn.disabled = false;
+                }
+            }, 50);
+        };
+    </script>
+</body>
+</html>
