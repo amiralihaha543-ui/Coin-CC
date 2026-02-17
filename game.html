@@ -3,169 +3,209 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🚀 Space Crash</title>
+<title>Rocket Game</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
 body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background: radial-gradient(circle at top,#0b1a2e,#050d1a);
-    color:white;
-    overflow:hidden;
+height:100vh;
+background: radial-gradient(circle at 30% 20%, #1a1f3f, #0a0f1f 70%);
+overflow:hidden;
+color:white;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
 }
 
-/* ستاره‌ها */
-body:before{
-    content:"";
-    position:absolute;
-    width:100%;
-    height:100%;
-    background:url("https://www.transparenttextures.com/patterns/stardust.png");
-    opacity:0.3;
+/* ✨ ستاره های متحرک */
+.stars{
+position:absolute;
+width:100%;
+height:100%;
+background: transparent;
+overflow:hidden;
+z-index:0;
 }
 
-/* ضریب بالا */
-#multiplier{
-    position:absolute;
-    top:20px;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:40px;
-    font-weight:bold;
-    text-shadow:0 0 20px #00bfff;
+.stars span{
+position:absolute;
+width:2px;
+height:2px;
+background:white;
+border-radius:50%;
+animation: twinkle 2s infinite alternate;
 }
 
-/* موشک */
-.rocket{
-    position:absolute;
-    top:35%;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:90px;
-    animation: float 2s ease-in-out infinite alternate;
+@keyframes twinkle{
+from{opacity:0.2}
+to{opacity:1}
 }
 
-@keyframes float{
-    from{transform:translate(-50%,0px);}
-    to{transform:translate(-50%,-20px);}
+/* 🚀 بخش بالا */
+.top-section{
+position:relative;
+z-index:2;
+text-align:center;
+margin-top:60px;
 }
 
-/* دکمه شرط */
-.bet-btn{
-    position:absolute;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    width:90%;
-    background:#2f6fff;
-    border:none;
-    padding:18px;
-    border-radius:15px;
-    font-size:20px;
-    color:white;
+.multiplier{
+font-size:48px;
+font-weight:800;
+background:linear-gradient(90deg,#9d4edd,#5a189a);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+text-shadow:0 0 25px #9d4edd;
 }
 
-/* دکمه برداشت */
-.cash-btn{
-    position:absolute;
-    bottom:90px;
-    left:50%;
-    transform:translateX(-50%);
-    width:90%;
-    background:#00c853;
-    border:none;
-    padding:15px;
-    border-radius:15px;
-    font-size:18px;
-    color:white;
+/* 💊 ضرایب */
+.multiplier-list{
+display:flex;
+justify-content:center;
+gap:12px;
+margin-top:20px;
 }
+
+.multiplier-item{
+background:rgba(255,255,255,0.07);
+padding:10px 20px;
+border-radius:50px;
+font-weight:600;
+cursor:pointer;
+transition:0.3s;
+}
+
+.multiplier-item:hover{
+background:#9d4edd;
+box-shadow:0 0 20px #9d4edd;
+}
+
+/* 🧊 کارت شیشه ای */
+.glass-card{
+width:90%;
+max-width:420px;
+margin:30px auto;
+padding:20px;
+border-radius:20px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(20px);
+box-shadow:0 0 40px rgba(157,78,221,0.3);
+z-index:2;
+position:relative;
+}
+
+.player{
+display:flex;
+justify-content:space-between;
+margin-bottom:15px;
+font-weight:600;
+opacity:0.9;
+}
+
+/* 🔵 دکمه اصلی */
+.bet-button{
+width:90%;
+max-width:420px;
+margin:20px auto 40px auto;
+padding:18px;
+border:none;
+border-radius:20px;
+font-size:20px;
+font-weight:700;
+cursor:pointer;
+background:linear-gradient(90deg,#3a86ff,#4361ee);
+color:white;
+box-shadow:0 0 30px rgba(67,97,238,0.6);
+transition:0.3s;
+z-index:2;
+position:relative;
+}
+
+.bet-button:hover{
+transform:scale(1.05);
+box-shadow:0 0 40px rgba(67,97,238,0.9);
+}
+
+/* 💰 دکمه برداشت */
+.cashout{
+background:linear-gradient(90deg,#00f5d4,#00bbf9);
+box-shadow:0 0 30px #00f5d4;
+}
+
 </style>
 </head>
-
 <body>
 
-<div id="multiplier">1.00x</div>
+<div class="stars"></div>
 
-<div class="rocket">🚀</div>
+<div class="top-section">
+<div class="multiplier" id="multi">x1.00</div>
 
-<button id="cashBtn" class="cash-btn" onclick="cashOut()" disabled>
-💰 برداشت پول
-</button>
+<div class="multiplier-list">
+<div class="multiplier-item">x1.55</div>
+<div class="multiplier-item">x1.01</div>
+<div class="multiplier-item">x1.86</div>
+<div class="multiplier-item">x2.40</div>
+</div>
+</div>
 
-<button id="betBtn" class="bet-btn" onclick="startGame()">
-🎯 شرط بندی
-</button>
+<div class="glass-card">
+<div class="player"> stexx35 ⭐ 1170 x1.30 ✅</div>
+<div class="player"> rik_profekt ⭐ 310 x1.55</div>
+<div class="player"> naser_sh1989 ⭐ 155 x1.55</div>
+</div>
+
+<button class="bet-button" id="mainBtn">ثبت شرط</button>
 
 <script>
-let multiplier = 1;
-let running = false;
-let crashed = false;
-let cashedOut = false;
-let crashPoint = 0;
-let betAmount = 100;
+
+/* ✨ ساخت ستاره ها */
+const starsContainer = document.querySelector('.stars');
+for(let i=0;i<80;i++){
+let star=document.createElement('span');
+star.style.top=Math.random()*100+"%";
+star.style.left=Math.random()*100+"%";
+star.style.animationDuration=(Math.random()*2+1)+"s";
+starsContainer.appendChild(star);
+}
+
+/* 🚀 رشد ضریب */
+let multiplier=1;
+let running=false;
 let interval;
 
-function startGame(){
-    if(running) return;
+const multiText=document.getElementById("multi");
+const btn=document.getElementById("mainBtn");
 
-    running = true;
-    crashed = false;
-    cashedOut = false;
-    multiplier = 1;
-    crashPoint = Math.random()*3 + 1;
-
-    document.getElementById("multiplier").innerText = "1.00x";
-    document.getElementById("betBtn").innerText = "⏳ در حال پرواز...";
-    document.getElementById("cashBtn").disabled = false;
-
-    interval = setInterval(()=>{
-        multiplier += 0.02;
-        document.getElementById("multiplier").innerText =
-            multiplier.toFixed(2)+"x";
-
-        if(multiplier >= crashPoint){
-            clearInterval(interval);
-            crashed = true;
-            running = false;
-
-            document.getElementById("multiplier").innerText =
-                "💥 انفجار در " + crashPoint.toFixed(2)+"x";
-
-            document.getElementById("betBtn").innerText = "🎯 شرط بندی";
-            document.getElementById("cashBtn").disabled = true;
-
-            if(!cashedOut){
-                sendToBot("lose", betAmount);
-            }
-        }
-    },50);
+btn.onclick=function(){
+if(!running){
+running=true;
+btn.textContent="برداشت پول";
+btn.classList.add("cashout");
+interval=setInterval(()=>{
+multiplier+=0.02;
+multiText.textContent="x"+multiplier.toFixed(2);
+},100);
+}else{
+running=false;
+clearInterval(interval);
+alert("برداشت شد در ضریب "+multiplier.toFixed(2));
+multiplier=1;
+multiText.textContent="x1.00";
+btn.textContent="ثبت شرط";
+btn.classList.remove("cashout");
+}
 }
 
-function cashOut(){
-    if(!running || crashed || cashedOut) return;
-
-    cashedOut = true;
-    running = false;
-    clearInterval(interval);
-
-    let winAmount = Math.floor(betAmount * multiplier);
-
-    document.getElementById("multiplier").innerText =
-        "✅ برداشت در " + multiplier.toFixed(2)+"x";
-
-    document.getElementById("betBtn").innerText = "🎯 شرط بندی";
-    document.getElementById("cashBtn").disabled = true;
-
-    sendToBot("win", winAmount);
-}
-
-function sendToBot(result, amount){
-    if(window.Telegram?.WebApp){
-        Telegram.WebApp.sendData(
-            JSON.stringify({result, amount})
-        );
-    }
-}
 </script>
 
 </body>
