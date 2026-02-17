@@ -1,56 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="fa">
 <head>
-    <title>بازی انفجار حرفه‌ای</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { background-color: #1a1a1a; color: #fff; font-family: Arial, sans-serif; text-align: center; }
-        #multiplier { font-size: 48px; margin-top: 100px; }
-        #startBtn { padding: 15px 30px; font-size: 24px; background-color: #8a2be2; border: none; border-radius: 10px; color: white; cursor: pointer; }
-        #startBtn:hover { background-color: #a64bf4; }
-    </style>
+<meta charset="UTF-8">
+<title>🚀 بازی انفجار سه‌بعدی نئونی</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { margin: 0; overflow: hidden; background: #1a1a1a; font-family: Arial, sans-serif; }
+  #startBtn {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    padding: 15px 30px; font-size: 24px; border: none; border-radius: 10px;
+    background: linear-gradient(45deg, #8a2be2, #a64bf4); color: #fff; cursor: pointer;
+    box-shadow: 0 0 20px #8a2be2;
+  }
+  #multiplier {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    font-size: 48px; color: #a64bf4; text-shadow: 0 0 20px #8a2be2;
+  }
+</style>
 </head>
 <body>
-    <h1>🚀 بازی انفجار</h1>
-    <div id="multiplier">1.00x</div>
-    <button id="startBtn">شروع بازی</button>
+<div id="multiplier">1.00x</div>
+<button id="startBtn">🚀 شروع بازی</button>
 
-    <script>
-        const startBtn = document.getElementById('startBtn');
-        const multiplierDiv = document.getElementById('multiplier');
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
 
-        function sendResultToBot(result, amount) {
-            if (window.Telegram.WebApp) {
-                Telegram.WebApp.sendData(JSON.stringify({ result: result, amount: amount }));
-            }
-        }
+<script>
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-        startBtn.onclick = () => {
-            let multiplier = 1.00;
-            multiplierDiv.innerText = multiplier.toFixed(2) + "x";
-            let crash = (Math.random() * 3 + 1).toFixed(2); // ضریب انفجار 1 تا 4
-            startBtn.disabled = true;
+// نور نئونی
+let light = new THREE.PointLight(0x8a2be2, 2, 500);
+light.position.set(0,0,50);
+scene.add(light);
 
-            const interval = setInterval(() => {
-                multiplier += 0.01;
-                multiplierDiv.innerText = multiplier.toFixed(2) + "x";
+// موشک سه‌بعدی
+let rocketGeometry = new THREE.ConeGeometry(0.5, 2, 32);
+let rocketMaterial = new THREE.MeshStandardMaterial({
+  color: 0xa64bf4, emissive: 0x8a2be2, emissiveIntensity: 0.8
+});
+let rocket = new THREE.Mesh(rocketGeometry, rocketMaterial);
+scene.add(rocket);
+rocket.position.y = -5;
 
-                if (multiplier.toFixed(2) >= crash) {
-                    clearInterval(interval);
-                    multiplierDiv.innerText = "💥 انفجار در " + crash + "x";
+// ذرات نور اطراف موشک
+let particleGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+let particleMaterial = new THREE.MeshBasicMaterial({color: 0x8a2be2});
+let particles = [];
+for(let i=0;i<50;i++){
+  let p = new THREE.Mesh(particleGeometry, particleMaterial);
+  p.position.set((Math.random()-0.5), (Math.random()-0.5), (Math.random()-0.5));
+  scene.add(p);
+  particles.push(p);
+}
 
-                    // تعیین برد یا باخت
-                    if (multiplier >= 2) { // مثال: ضریب ≥2 → برد
-                        sendResultToBot("win", Math.round(100 * crash));
-                    } else {
-                        sendResultToBot("lose", 100);
-                    }
+camera.position.z = 5;
 
-                    startBtn.disabled = false;
-                }
-            }, 50);
-        };
-    </script>
+let multiplierDiv = document.getElementById('multiplier');
+let startBtn = document.getElementById('startBtn');
+let multiplier = 1.0;
+let crash = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  rocket.rotation.y += 0.02;
+  particles.forEach(p => {
+    p.position.y += 0.05;
+    if(p.position.y > 5) p.position.y = -5;
+  });
+  renderer.render(scene, camera);
+}
+animate();
+
+// ارسال نتیجه به ربات
+function sendResultToBot(result, amount){
+  if(window.Telegram?.WebApp){
+    Telegram.WebApp.sendData(JSON.stringify({result, amount}));
+  }
+}
+
+startBtn.onclick = () => {
+  multiplier = 1.0;
+  multiplierDiv.innerText = multiplier.toFixed(2) + "x";
+  crash = Math.random() * 3 + 1; // ضریب انفجار 1 تا 4
+  startBtn.disabled = true;
+  rocket.position.y = -5;
+
+  const interval = setInterval(()=>{
+    multiplier += 0.01;
+    multiplierDiv.innerText = multiplier.toFixed(2) + "x";
+    rocket.position.y += 0.05;
+
+    // جلوه ذرات سریع‌تر هنگام حرکت موشک
+    particles.forEach(p=>{
+      p.position.x += (Math.random()-0.5)*0.02;
+      p.position.z += (Math.random()-0.5)*0.02;
+    });
+
+    if(multiplier.toFixed(2) >= crash){
+      clearInterval(interval);
+      multiplierDiv.innerText = "💥 انفجار در " + crash.toFixed(2) + "x";
+
+      // برد یا باخت
+      if(multiplier >= 2){
+        sendResultToBot("win", Math.round(100*crash));
+      } else {
+        sendResultToBot("lose", 100);
+      }
+
+      startBtn.disabled = false;
+    }
+  },50);
+};
+</script>
 </body>
 </html>
