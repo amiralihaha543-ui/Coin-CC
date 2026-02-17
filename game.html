@@ -2,29 +2,13 @@
 <html>
 <head>
     <title>بازی انفجار حرفه‌ای</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            background-color: #1a1a1a;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        #multiplier {
-            font-size: 48px;
-            margin-top: 100px;
-        }
-        #startBtn {
-            padding: 15px 30px;
-            font-size: 24px;
-            background-color: #8a2be2;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-        }
-        #startBtn:hover {
-            background-color: #a64bf4;
-        }
+        body { background-color: #1a1a1a; color: #fff; font-family: Arial, sans-serif; text-align: center; }
+        #multiplier { font-size: 48px; margin-top: 100px; }
+        #startBtn { padding: 15px 30px; font-size: 24px; background-color: #8a2be2; border: none; border-radius: 10px; color: white; cursor: pointer; }
+        #startBtn:hover { background-color: #a64bf4; }
     </style>
 </head>
 <body>
@@ -35,6 +19,12 @@
     <script>
         const startBtn = document.getElementById('startBtn');
         const multiplierDiv = document.getElementById('multiplier');
+
+        function sendResultToBot(result, amount) {
+            if (window.Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({ result: result, amount: amount }));
+            }
+        }
 
         startBtn.onclick = () => {
             let multiplier = 1.00;
@@ -49,6 +39,14 @@
                 if (multiplier.toFixed(2) >= crash) {
                     clearInterval(interval);
                     multiplierDiv.innerText = "💥 انفجار در " + crash + "x";
+
+                    // تعیین برد یا باخت
+                    if (multiplier >= 2) { // مثال: ضریب ≥2 → برد
+                        sendResultToBot("win", Math.round(100 * crash));
+                    } else {
+                        sendResultToBot("lose", 100);
+                    }
+
                     startBtn.disabled = false;
                 }
             }, 50);
