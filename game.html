@@ -2,119 +2,155 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
-<title>🚀 بازی انفجار سه‌بعدی نئونی</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚀 Space Crash</title>
+
 <style>
-  body { margin: 0; overflow: hidden; background: #1a1a1a; font-family: Arial, sans-serif; }
-  #startBtn {
-    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-    padding: 15px 30px; font-size: 24px; border: none; border-radius: 10px;
-    background: linear-gradient(45deg, #8a2be2, #a64bf4); color: #fff; cursor: pointer;
-    box-shadow: 0 0 20px #8a2be2;
-  }
-  #multiplier {
-    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-    font-size: 48px; color: #a64bf4; text-shadow: 0 0 20px #8a2be2;
-  }
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at top,#0b1a2e,#050d1a);
+    color:white;
+    overflow:hidden;
+}
+
+/* ستاره‌های پس زمینه */
+body:before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:url("https://www.transparenttextures.com/patterns/stardust.png");
+    opacity:0.3;
+}
+
+/* موشک */
+.rocket{
+    position:absolute;
+    top:30%;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:80px;
+    animation: float 2s ease-in-out infinite alternate;
+}
+
+@keyframes float{
+    from{transform:translate(-50%,0px);}
+    to{transform:translate(-50%,-20px);}
+}
+
+/* ضریب بالا */
+#multiplier{
+    position:absolute;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:38px;
+    font-weight:bold;
+    text-shadow:0 0 20px #00bfff;
+}
+
+/* دکمه‌های ضریب */
+.multiplier-row{
+    position:absolute;
+    top:55%;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+.mult-btn{
+    background:#1e2a3d;
+    padding:10px 20px;
+    border-radius:25px;
+    color:#fff;
+    font-weight:bold;
+    opacity:0.8;
+}
+
+.mult-btn.active{
+    background:white;
+    color:black;
+}
+
+/* باکس لیست */
+.players{
+    position:absolute;
+    bottom:100px;
+    width:100%;
+    background:rgba(20,30,50,0.9);
+    border-top-left-radius:20px;
+    border-top-right-radius:20px;
+    padding:15px;
+}
+
+/* دکمه شرط */
+.bet-btn{
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    width:90%;
+    background:#2f6fff;
+    border:none;
+    padding:18px;
+    border-radius:15px;
+    font-size:20px;
+    color:white;
+}
 </style>
 </head>
-<body>
-<div id="multiplier">1.00x</div>
-<button id="startBtn">🚀 شروع بازی</button>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+<body>
+
+<div id="multiplier">1.00x</div>
+
+<div class="rocket">🚀</div>
+
+<div class="multiplier-row">
+    <div class="mult-btn active">x1.55</div>
+    <div class="mult-btn">x1.01</div>
+    <div class="mult-btn">x1.86</div>
+    <div class="mult-btn">x2.20</div>
+</div>
+
+<div class="players">
+    <div>👤 stexx35 ⭐ 1,170 — x1.30 ✔</div>
+    <div>👤 rik_profekt ⭐ 310 — x1.55</div>
+    <div>👤 naser_sh1989 ⭐ 155 — x1.55</div>
+</div>
+
+<button class="bet-btn" onclick="startGame()">🎯 شرط بندی</button>
 
 <script>
-let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-let renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+let multiplier=1;
+let running=false;
 
-// نور نئونی
-let light = new THREE.PointLight(0x8a2be2, 2, 500);
-light.position.set(0,0,50);
-scene.add(light);
+function startGame(){
+    if(running) return;
+    running=true;
+    multiplier=1;
+    let crash=Math.random()*3+1;
 
-// موشک سه‌بعدی
-let rocketGeometry = new THREE.ConeGeometry(0.5, 2, 32);
-let rocketMaterial = new THREE.MeshStandardMaterial({
-  color: 0xa64bf4, emissive: 0x8a2be2, emissiveIntensity: 0.8
-});
-let rocket = new THREE.Mesh(rocketGeometry, rocketMaterial);
-scene.add(rocket);
-rocket.position.y = -5;
+    let interval=setInterval(()=>{
+        multiplier+=0.02;
+        document.getElementById("multiplier").innerText=multiplier.toFixed(2)+"x";
 
-// ذرات نور اطراف موشک
-let particleGeometry = new THREE.SphereGeometry(0.05, 8, 8);
-let particleMaterial = new THREE.MeshBasicMaterial({color: 0x8a2be2});
-let particles = [];
-for(let i=0;i<50;i++){
-  let p = new THREE.Mesh(particleGeometry, particleMaterial);
-  p.position.set((Math.random()-0.5), (Math.random()-0.5), (Math.random()-0.5));
-  scene.add(p);
-  particles.push(p);
+        if(multiplier>=crash){
+            clearInterval(interval);
+            document.getElementById("multiplier").innerText="💥 "+crash.toFixed(2)+"x";
+            running=false;
+
+            if(window.Telegram?.WebApp){
+                let result=multiplier>=2?"win":"lose";
+                let amount=100;
+                Telegram.WebApp.sendData(JSON.stringify({result,amount}));
+            }
+        }
+    },50);
 }
-
-camera.position.z = 5;
-
-let multiplierDiv = document.getElementById('multiplier');
-let startBtn = document.getElementById('startBtn');
-let multiplier = 1.0;
-let crash = 0;
-
-function animate() {
-  requestAnimationFrame(animate);
-  rocket.rotation.y += 0.02;
-  particles.forEach(p => {
-    p.position.y += 0.05;
-    if(p.position.y > 5) p.position.y = -5;
-  });
-  renderer.render(scene, camera);
-}
-animate();
-
-// ارسال نتیجه به ربات
-function sendResultToBot(result, amount){
-  if(window.Telegram?.WebApp){
-    Telegram.WebApp.sendData(JSON.stringify({result, amount}));
-  }
-}
-
-startBtn.onclick = () => {
-  multiplier = 1.0;
-  multiplierDiv.innerText = multiplier.toFixed(2) + "x";
-  crash = Math.random() * 3 + 1; // ضریب انفجار 1 تا 4
-  startBtn.disabled = true;
-  rocket.position.y = -5;
-
-  const interval = setInterval(()=>{
-    multiplier += 0.01;
-    multiplierDiv.innerText = multiplier.toFixed(2) + "x";
-    rocket.position.y += 0.05;
-
-    // جلوه ذرات سریع‌تر هنگام حرکت موشک
-    particles.forEach(p=>{
-      p.position.x += (Math.random()-0.5)*0.02;
-      p.position.z += (Math.random()-0.5)*0.02;
-    });
-
-    if(multiplier.toFixed(2) >= crash){
-      clearInterval(interval);
-      multiplierDiv.innerText = "💥 انفجار در " + crash.toFixed(2) + "x";
-
-      // برد یا باخت
-      if(multiplier >= 2){
-        sendResultToBot("win", Math.round(100*crash));
-      } else {
-        sendResultToBot("lose", 100);
-      }
-
-      startBtn.disabled = false;
-    }
-  },50);
-};
 </script>
+
 </body>
 </html>
